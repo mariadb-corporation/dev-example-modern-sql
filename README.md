@@ -11,59 +11,99 @@
 The following will walk you through the steps for setting up [Apache Zeppelin](https://zeppelin.apache.org/) to integrate with MariaDB and work with several samples of modern SQL functionality. 
 
 # Table of Contents
-1. [Environment and Compatibility](#compatibility)
-2. [Getting started with MariaDB](#overview)
-    1. [The Basics](#intro-mariadb)
-    2. [Downloading and installing MariaDB](#installation)
-3. [Requirements](#requirements)
-4. [Getting started with Apache Zeppelin](#getting-started)
-5. [Support and Contribution](#support-contribution)
-6. [License](#license)
+1. [Requirements](#requirements)
+2. [Introduction to MariaDB](#introduction)
+    1. [MariaDB Platform](#platform)
+    2. [MariaDB SkySQL](#skysql)
+3. [Preparing the database](#prepare)
+    1. [Create the schema](#schema)
+    2. [Load the data](#data)
+4. [Using Apache Zeppelin](#getting-started)
+    1. [Adding a MariaDB Interpreter](#add-interpreter)
+    2. [Importing Zeppelin notes](#import-note)
+5. [Raw Queries](#queries)
+6. [Support and Contribution](#support-contribution)
+7. [License](#license)
 
-## Environment and Compatibility <a name="compatibility"></a>
-
-This sample was created using the following techologies:
-
-* [MariaDB](https://mariadb.com/products/mariadb-platform/)
-* [Apache Zeppelin](https://zeppelin.apache.org/)
-
-This application was tested on [macOS Mojave v.10.14.6](https://developer.apple.com/documentation/macos_release_notes/macos_mojave_10_14_6_release_notes).
-
-## Overview <a name="overview"></a>
-
-### Introduction to MariaDB <a name="intro-mariadb"></a>
-
-[MariaDB platform](https://mariadb.com/products/mariadb-platform/) unifies [MariaDB TX (transactions)](https://mariadb.com/products/mariadb-platform-transactional/) and [MariaDB AX (analytics)](https://mariadb.com/products/mariadb-platform-analytical/) so transactional applications can retain unlimited historical data and leverage powerful, real-time analytics in order to provide data-driven customers with more information, actionable insight and greater value – and businesses with endless ways to monetize data. It is the enterprise open source database for hybrid transactional/analytical processing at scale.
-
-### Getting start with MariaDB <a name="installation"></a>
-
-To download and deploy MariaDB check out the instructions [here](https://mariadb.com/docs/deploy/installation/). You can also make use of the [MariaDB Image available on Docker Hub](https://hub.docker.com/_/mariadb).
-
-### Create the schema <a name="create-schema"></a>
-
-Next execute the SQL within [create_schema_data.sql](create_schema_data.sql) within a new database. The script will create the following tables
-
-* supers
-* teams
-* supersteams
-
-and insert a small amount of sample data into them. From there you can add/remove your own data!
-
-## Requirements <a name="requirements"></a>
+## Environment and Compatibility <a name="requirements"></a>
 
 This project assumes you have familiarity with building web applications using ReactJS and NodeJS technologies. 
 
-* Download and install [MariaDB](#installation). 
+* Download and install [MariaDB](#introduction). 
 * Download and install [Apache Zeppelin](https://zeppelin.apache.org/download.html).
 * git (Optional) - this is required if you would prefer to pull the source code from GitHub repo.
     - Create a [free github account](https://github.com/) if you don’t already have one
     - git can be downloaded from git-scm.org
 
+## Introduction to MariaDB <a name="introduction"></a>
+
+### MariaDB Platform <a name="platform"></a>
+
+[MariaDB Platform](https://mariadb.com/products/mariadb-platform/) integrates [transactional](https://mariadb.com/products/mariadb-platform-transactional/) and [analytical](https://mariadb.com/products/mariadb-platform-analytical/) products so developers can build modern applications by enriching transactions with real-time analytics and historical data, creating insightful experiences and compelling opportunities for customers – and for businesses, endless ways to monetize data. 
+
+<p align="center" spacing="10">
+    <kbd>
+        <img src="media/platform.png" />
+    </kbd>
+</p>
+
+To get started using MariaDB locally you can choose one of the following options:
+
+* [Download and install MariaDB (Community or Enterprise) directly from mariadb.com](https://mariadb.com/docs/deploy/installation/) 
+
+* [Download and install MariaDB using the official MariaDB Community Server 10.5 Docker Image available at hub.docker.com](https://hub.docker.com/r/mariadb/columnstore)
+
+### MariaDB SkySQL <a name="skysql">
+
+[SkySQL](https://mariadb.com/products/skysql/) is the first and only database-as-a-service (DBaaS) to bring the full power of MariaDB Platform to the cloud, including its support for transactional, analytical and hybrid workloads. Built on Kubernetes, and optimized for cloud infrastructure and services, SkySQL combines ease of use and self-service with enterprise reliability and world-class support – everything needed to safely run mission-critical databases in the cloud, and with enterprise governance.
+
+[Get started with SkySQL!](https://mariadb.com/products/skysql/#get-started)
+
+<p align="center" spacing="10">
+    <kbd>
+        <img src="media/skysql.png" />
+    </kbd>
+</p>
+
+## Preparing the database <a name="prepare"></a>
+
+### Create the schema <a name="schema"></a>
+
+Next execute the SQL within [schema.sql](sql/schema.sql) either manually within a new database, or using the MariaDB client:
+
+Locally (with root and empty password):
+```bash
+$ mariadb < sql/schema.sql
+```
+
+MariaDB SkySQL:
+```bash
+mariadb --host tx-1.mdb0001390.db.skysql.net --port 5002 --user DB00003108 -pPassword123! --ssl-ca ~/Downloads/skysql_chain.pem < sql/schema.sql>
+```
+
+**Note:** The previous commands assume you have the MariaDB client installed, the relative locations of [schema.sql](sql/schema.sql) and the skysql_chain.pem file residing in a directory called `Downloads`. But all things are configurable :)
+
+The script will create the following tables within a database called `demo`:
+
+* `supers`
+* `teams`
+* `supersteams`
+
+### Load the data <a name="data"></a>
+
+Once the database and tables have been created, execute the [data.sql](sql/data.sql) script to load data into the tables.
+
+```bash
+$ mariadb < sql/data.sql
+```
+
 ## Getting started with Apache Zeppelin<a name="getting-started"></a>
 
-### Adding a MariaDB interpreter
+### Adding a MariaDB interpreter <a name="add-interpreter></a>
 
-Once you've downloaded and installed Apache Zeppelin you will need to add a new [interpreter](https://zeppelin.apache.org/docs/0.8.2/usage/interpreter/overview.html) for MariaDB using the following steps:
+For a more comprehensive step-by-step walk-through of how to setup and use Zeppelin with MariaDB check out [this blog post](https://mariadb.com/resources/blog/create-beautiful-data-with-mariadb-skysql-and-apache-zeppelin/)!
+
+After you've downloaded and installed Apache Zeppelin you will need to add a new [interpreter](https://zeppelin.apache.org/docs/0.8.2/usage/interpreter/overview.html) for MariaDB using the following steps:
 
 1. Navigate to "Interpreter".
 
@@ -99,16 +139,24 @@ Once you've downloaded and installed Apache Zeppelin you will need to add a new 
     </kbd>
 </p>
 
-### Importing the notebooks
+### Importing notes <a name="import-notes"></a>
 
-Import the notes:
+In Zeppelin, a notebook is simply a collection of notes, which is a collection of “paragraphs”. Each paragraph then uses an interpreter (via MariaDB Connector/J) to connect to and communicate with a datasource (MariaDB).
 
-* [demo_1.json](demo_1.json): Set operators, table value constructors, aggregation functions, and rollups. 
-* [demo_2.json](demo_2.json): Window functions and common table expressions (recursive).
-* [demo_3.json](demo_3.json): Temporal tables.
+<p align="center" spacing="10">
+    <kbd>
+        <img src="media/zeppelin.png" />
+    </kbd>
+</p>
+
+This repo contains several notes that demonstrate a variety of modern SQL capabilities within MariaDB. 
+
+* [demo_1](zeppelin/demo_1.json), [demo_4](zeppelin/demo_4.json): Set operators, table value constructors, aggregation functions, and rollups. 
+* [demo_2](zeppelin/demo_2.json), [demo_5](zeppelin/demo_5.json): Window functions and common table expressions (recursive).
+* [demo_3](zeppelin/demo_3.json), [demo_6](zeppelin/demo_6.json): Temporal tables.
 * [bitemporal-table-demo](bitemporal-table-demo.json): A comprehensive look at a MariaDB Bitemporal table. 
 
-by selecting "Import note".
+Notes can be imported into Zeppelin by clicking the "Import Note" button, and providing a valid `json` note file.
 
 <p align="center" spacing="10">
     <kbd>
@@ -116,6 +164,9 @@ by selecting "Import note".
     </kbd>
 </p>
 
+## Raw Queires <a name="queries"></a>
+
+If you'd prefer to execute the SQL queries contained within the Apache Zeppelin you can find them all within [demos.sql](sql/demos.sql).
 
 ## Support and Contribution <a name="support-contribution"></a>
 
