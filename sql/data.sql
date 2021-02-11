@@ -33,6 +33,3 @@ VALUES
     (8,1),
     (8,2),
     (9,3);
-
-
-/* mariadb --host transactions-1.mdb0001390.db.skysql.net --port 5002 --user DB00003108 -p'E30W9,614oI6/8s1pn7Vl8' --ssl-ca ~/Downloads/skysql_chain.pem < schema.sql */
